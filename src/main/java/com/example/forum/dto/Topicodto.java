@@ -1,6 +1,7 @@
 package com.example.forum.dto;
 
 import com.example.forum.modelo.Topico;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,8 +22,8 @@ public class Topicodto {
 
 
     //converte topico para topicodto usando Stream do java 8
-    public static List<Topicodto> converter(List<Topico> topicos){
-        return topicos.stream().map(Topicodto::new).collect(Collectors.toList());
+    public static Page<Topicodto> converter(Page<Topico> topicos){
+        return topicos.map(Topicodto::new);
     }
 
     public Long getId() {
