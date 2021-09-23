@@ -10,6 +10,8 @@ import com.example.forum.modelo.Curso;
 import com.example.forum.repository.CursoRepository;
 import com.example.forum.repository.TopicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,7 @@ public class TopicosController {
     private CursoRepository cursoRepository;
 
     @GetMapping //os parametros vem do GET topicos?page=0&size=10&sort=id,asc
+    @Cacheable(value = "listaTopicos", key="#root.method.name")
     public Page<Topicodto> lista(@RequestParam(required = false) String nomeCurso,
                                  @PageableDefault(sort = "id", size = 20) Pageable paginacao) {
 
@@ -68,6 +71,7 @@ public class TopicosController {
 
     @PostMapping
     @Transactional//requestBody avisa ao spring que o parametro vem do metodo post; Valid ativa validacoes
+    @CacheEvict(value = "listaTopicos", allEntries = true)
     public ResponseEntity<Topicodto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
 
         Topico topico = form.converter(cursoRepository);
@@ -93,6 +97,7 @@ public class TopicosController {
 
     @DeleteMapping("/{id}")
     @Transactional
+    @CacheEvict(value = "listaTopicos", allEntries = true)
     public ResponseEntity<?> remover(@PathVariable Long id) {
         Optional<Topico> topico = topicoRepository.findById(id);
         if (topico.isPresent()) {
